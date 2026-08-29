@@ -1,4 +1,4 @@
-// Theme toggle + graph/list view switching.
+// Theme toggle + game/text view switching.
 (function () {
   var root = document.documentElement;
 
@@ -7,25 +7,19 @@
     toggle.addEventListener("click", function () {
       var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
       root.setAttribute("data-theme", next);
-      try {
-        localStorage.setItem("theme", next);
-      } catch (e) {}
+      try { localStorage.setItem("theme", next); } catch (e) {}
       window.dispatchEvent(new Event("themechange"));
     });
   }
 
-  function setList(on) {
-    root.classList.toggle("list", on);
-    try {
-      history.replaceState(null, "", on ? "#list" : "#graph");
-    } catch (e) {}
+  function setText(on) {
+    root.classList.toggle("text", on);
+    try { localStorage.setItem("view", on ? "text" : "game"); } catch (e) {}
     window.scrollTo(0, 0);
     window.dispatchEvent(new Event("viewchange"));
   }
-
-  var toList = document.getElementById("to-list");
-  var toGraph = document.getElementById("to-graph");
-  if (toList) toList.addEventListener("click", function () { setList(true); });
-  if (toGraph) toGraph.addEventListener("click", function () { setList(false); });
-  if (location.hash === "#list") root.classList.add("list");
+  var toText = document.getElementById("to-text");
+  var toGame = document.getElementById("to-game");
+  if (toText) toText.addEventListener("click", function () { setText(true); });
+  if (toGame) toGame.addEventListener("click", function () { setText(false); });
 })();

@@ -1,52 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div id="graph-view" aria-hidden="true">
-  <canvas id="graph"></canvas>
+<div id="game" aria-hidden="true">
+  <canvas id="stage"></canvas>
 
-  <div class="hud hud-tl">
-    <p class="mono kicker">// knowledge graph</p>
-    <h1>{{ site.name }}</h1>
-    <p class="tagline">{{ site.tagline }}</p>
-    <p class="hud-hint mono">drag nodes · scroll to zoom · click a node</p>
+  <div class="hud hud-top">
+    <p class="press title-mini">{{ site.name }}</p>
+    <p class="vt hint">arrows / WASD to move · <b>E</b> or <b>space</b> to enter · walk to a building</p>
   </div>
 
-  <div class="hud hud-bl mono legend">
-    <span><i data-t="project"></i>project</span>
-    <span><i data-t="tech"></i>tech</span>
-    <span><i data-t="experience"></i>experience</span>
-    <span><i data-t="achievement"></i>achievement</span>
+  <button id="to-text" class="gbtn vt" type="button">read as text →</button>
+
+  <div id="titlecard" class="press"><span>PRADYUMNA'S<br />WORLD</span><em class="vt">press any key</em></div>
+
+  <div id="dpad" aria-hidden="true">
+    <button data-k="up" aria-label="up">▲</button>
+    <button data-k="left" aria-label="left">◀</button>
+    <button data-k="act" aria-label="action">E</button>
+    <button data-k="right" aria-label="right">▶</button>
+    <button data-k="down" aria-label="down">▼</button>
   </div>
 
-  <button id="to-list" class="hud hud-tr btn mono" type="button">list view →</button>
-
-  <aside id="panel" class="mono" hidden>
-    <button id="panel-close" type="button" aria-label="Close">✕</button>
-    <div id="panel-body"></div>
+  <aside id="quest" class="vt" hidden>
+    <button id="quest-close" type="button" aria-label="Close">✕</button>
+    <div id="quest-body"></div>
   </aside>
 </div>
 
-<script id="graph-data" type="application/json">{{ graph_json | safe }}</script>
+<script id="world-data" type="application/json">{{ world_json | safe }}</script>
 
-<!-- Accessible / SEO fallback. Shown when JS is off or the visitor picks list view. -->
-<div id="list-view">
+<!-- Text version: same content, for no-JS and search engines. -->
+<div id="text-view">
   <section class="hero">
-    <p class="mono kicker">// backend · ai-ml · data</p>
+    <p class="kicker vt">backend · ai-ml · data</p>
     <h1>{{ site.name }}</h1>
     <p class="tagline">{{ site.tagline }}</p>
-    <p class="subline mono">{{ site.subline }}</p>
+    <p class="subline vt">{{ site.subline }}</p>
     <div class="cta">
-      <a class="btn primary" href="{{ site.resume_path }}" target="_blank" rel="noopener">Résumé (PDF)</a>
-      <a class="btn" href="mailto:{{ site.email }}">{{ site.email }}</a>
+      <a class="gbtn primary" href="{{ site.resume_path }}" target="_blank" rel="noopener">Résumé (PDF)</a>
+      <a class="gbtn" href="mailto:{{ site.email }}">{{ site.email }}</a>
       {% for label, url in site.links.items() %}
-        <a class="btn ghost" href="{{ url }}" target="_blank" rel="noopener">{{ label }}</a>
+        <a class="gbtn ghost" href="{{ url }}" target="_blank" rel="noopener">{{ label }}</a>
       {% endfor %}
-      <button id="to-graph" class="btn ghost mono" type="button">← graph view</button>
+      <button id="to-game" class="gbtn ghost vt" type="button">← play the map</button>
     </div>
-    <p class="loc mono">{{ site.location }}</p>
+    <p class="loc vt">{{ site.location }}</p>
   </section>
 
-  <section id="projects">
+  <section>
     <h2>Projects</h2>
     <div class="grid">
       {% for p in projects %}
@@ -54,50 +55,41 @@
         <h3>{{ p.name }}{% if p.team %} <span class="pill">team</span>{% endif %}</h3>
         <p>{{ p.blurb }}</p>
         <ul class="dots">{% for h in p.highlights %}<li>{{ h }}</li>{% endfor %}</ul>
-        <p class="stack mono">{{ p.stack | join(" · ") }}</p>
+        <p class="stack vt">{{ p.stack | join(" · ") }}</p>
         <a class="src" href="{{ p.repo }}" target="_blank" rel="noopener">source →</a>
       </article>
       {% endfor %}
     </div>
   </section>
 
-  <section id="experience">
+  <section>
     <h2>Experience</h2>
     {% for e in experience %}
     <div class="row">
-      <div class="row-head">
-        <strong>{{ e.role }}</strong> · {{ e.company }}
-        <span class="mono muted">{{ e.period }} — {{ e.location }}</span>
-      </div>
+      <div class="row-head"><strong>{{ e.role }}</strong> · {{ e.company }}
+        <span class="vt muted">{{ e.period }} — {{ e.location }}</span></div>
       <ul class="dots">{% for pt in e.points %}<li>{{ pt }}</li>{% endfor %}</ul>
     </div>
     {% endfor %}
-
     <h2 class="sub">Education</h2>
     {% for ed in education %}
-    <div class="row compact">
-      <strong>{{ ed.what }}</strong> · {{ ed.where }}
-      <span class="mono muted">{{ ed.period }} · {{ ed.note }}</span>
-    </div>
+    <div class="row compact"><strong>{{ ed.what }}</strong> · {{ ed.where }}
+      <span class="vt muted">{{ ed.period }} · {{ ed.note }}</span></div>
     {% endfor %}
-
     <h2 class="sub">Achievements</h2>
     <ul class="dots">{% for a in achievements %}<li>{{ a.text }}</li>{% endfor %}</ul>
   </section>
 
-  <section id="stack">
+  <section>
     <h2>Stack</h2>
-    <div class="stack-grid mono">
+    <div class="stack-grid vt">
       <div><span class="muted">languages</span><br />Python · Java · C++ · SQL</div>
       <div><span class="muted">backend</span><br />FastAPI · REST · JWT/OAuth · Microservices · Docker · Linux</div>
       <div><span class="muted">data</span><br />PostgreSQL · MySQL · SQL Server · Redis · ChromaDB · ETL pipelines</div>
       <div><span class="muted">ai / ml</span><br />scikit-learn · TensorFlow · LangChain · RAG · Reinforcement Learning</div>
-      <div><span class="muted">core cs</span><br />DSA · Operating Systems · OOP · DBMS · Computer Networks</div>
-      <div><span class="muted">tools</span><br />Git · GitHub · Linux · VS Code</div>
     </div>
-    <p class="note mono">This site is a FastAPI app — the graph above is a hand-written force
-    simulation on canvas. A live dashboard and a RAG "ask my portfolio" chatbot ship next.
-    <a href="/api">See the API →</a></p>
+    <p class="note vt">This site is a FastAPI app; the map is a hand-written tile engine on canvas.
+    A live dashboard and a RAG "ask my portfolio" chatbot ship next. <a href="/api">See the API →</a></p>
   </section>
 </div>
 {% endblock %}
