@@ -98,10 +98,24 @@ PROJECTS = [
 ]
 
 ACHIEVEMENTS = [
-    "1st Prize — Open Innovation Track, 48-hour MIT National Hackathon 2025 (300+ teams).",
-    "1st Prize — SIT Pitchathon 2025 and 2026.",
-    "Solved 400+ DSA problems on LeetCode (arrays, sliding window, greedy, and more).",
-    "Lead — AI Brewery club (Aug 2024–present): ran 50+ hackathons and workshops end to end.",
+    {
+        "label": "MIT Hackathon '25",
+        "text": (
+            "1st Prize — Open Innovation Track, 48-hour MIT National Hackathon 2025 (300+ teams)."
+        ),
+    },
+    {"label": "SIT Pitchathon", "text": "1st Prize — SIT Pitchathon 2025 and 2026."},
+    {
+        "label": "400+ DSA",
+        "text": "Solved 400+ DSA problems on LeetCode (arrays, sliding window, greedy, and more).",
+    },
+    {
+        "label": "AI Brewery Lead",
+        "text": (
+            "Lead — AI Brewery club (Aug 2024–present): ran 50+ hackathons "
+            "and workshops end to end."
+        ),
+    },
 ]
 
 EDUCATION = [

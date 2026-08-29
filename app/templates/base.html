@@ -5,23 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}{{ site.name }} — Backend & AI/ML Engineer{% endblock %}</title>
   <meta name="description" content="{{ site.tagline }}" />
-
   <meta property="og:type" content="website" />
   <meta property="og:title" content="{{ site.name }} — Backend & AI/ML Engineer" />
   <meta property="og:description" content="{{ site.tagline }}" />
-
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9889;</text></svg>" />
+  <script>
+    // Set theme + js flag before first paint to avoid a flash.
+    (function () {
+      var r = document.documentElement;
+      r.classList.add("js");
+      try {
+        var t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") r.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="/static/css/style.css" />
   <script defer src="/static/js/app.js"></script>
+  <script defer src="/static/js/graph.js"></script>
 </head>
 <body>
-  <a class="skip" href="#main">Skip to content</a>
   <header class="topbar">
     <a class="brand" href="/">pradyumna<span class="accent">.dev</span></a>
     <nav>
-      <a href="#projects">projects</a>
-      <a href="#experience">experience</a>
-      <a href="#stack">stack</a>
       <a href="{{ site.links['GitHub'] }}" target="_blank" rel="noopener">github</a>
       <button id="theme-toggle" type="button" aria-label="Toggle colour theme">◐</button>
     </nav>
@@ -33,7 +39,7 @@
 
   <footer>
     <span>© {{ site.name }}</span>
-    <span class="mono">built with FastAPI · deployed on Render · <a href="/api">API docs</a></span>
+    <span class="mono">FastAPI · canvas force-sim · deployed on Render · <a href="/api">API</a></span>
   </footer>
 </body>
 </html>

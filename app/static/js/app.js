@@ -1,29 +1,31 @@
-// Theme toggle with persistence. Dark is the default; respect a stored choice
-// and fall back to the OS preference on first visit.
+// Theme toggle + graph/list view switching.
 (function () {
-  const root = document.documentElement;
-  let stored = null;
-  try {
-    stored = localStorage.getItem("theme");
-  } catch (_) {
-    /* storage blocked — fine */
-  }
-  if (stored === "light" || stored === "dark") {
-    root.setAttribute("data-theme", stored);
-  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
-    root.setAttribute("data-theme", "light");
-  }
+  var root = document.documentElement;
 
-  const btn = document.getElementById("theme-toggle");
-  if (btn) {
-    btn.addEventListener("click", function () {
-      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+  var toggle = document.getElementById("theme-toggle");
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
       root.setAttribute("data-theme", next);
       try {
         localStorage.setItem("theme", next);
-      } catch (_) {
-        /* ignore */
-      }
+      } catch (e) {}
+      window.dispatchEvent(new Event("themechange"));
     });
   }
+
+  function setList(on) {
+    root.classList.toggle("list", on);
+    try {
+      history.replaceState(null, "", on ? "#list" : "#graph");
+    } catch (e) {}
+    window.scrollTo(0, 0);
+    window.dispatchEvent(new Event("viewchange"));
+  }
+
+  var toList = document.getElementById("to-list");
+  var toGraph = document.getElementById("to-graph");
+  if (toList) toList.addEventListener("click", function () { setList(true); });
+  if (toGraph) toGraph.addEventListener("click", function () { setList(false); });
+  if (location.hash === "#list") root.classList.add("list");
 })();
