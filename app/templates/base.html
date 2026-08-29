@@ -8,21 +8,24 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="{{ site.name }} — Backend & AI/ML Engineer" />
   <meta property="og:description" content="{{ site.tagline }}" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9889;</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127918;</text></svg>" />
   <script>
-    // Set theme + js flag before first paint to avoid a flash.
     (function () {
       var r = document.documentElement;
       r.classList.add("js");
       try {
         var t = localStorage.getItem("theme");
         if (t === "light" || t === "dark") r.setAttribute("data-theme", t);
+        if (localStorage.getItem("view") === "text") r.classList.add("text");
       } catch (e) {}
     })();
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/style.css" />
   <script defer src="/static/js/app.js"></script>
-  <script defer src="/static/js/graph.js"></script>
+  <script defer src="/static/js/rpg.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -39,7 +42,7 @@
 
   <footer>
     <span>© {{ site.name }}</span>
-    <span class="mono">FastAPI · canvas force-sim · deployed on Render · <a href="/api">API</a></span>
+    <span class="mono">FastAPI · hand-written tile engine · <a href="/api">API</a></span>
   </footer>
 </body>
 </html>
