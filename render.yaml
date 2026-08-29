@@ -1,0 +1,16 @@
+# Render Blueprint. In the Render dashboard: New → Blueprint → point at this repo.
+services:
+  - type: web
+    name: pradyumna-portfolio
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: APP_ENV
+        value: production

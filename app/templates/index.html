@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+  <p class="mono kicker">// backend · ai-ml · data</p>
+  <h1>{{ site.name }}</h1>
+  <p class="tagline">{{ site.tagline }}</p>
+  <p class="subline mono">{{ site.subline }}</p>
+  <div class="cta">
+    <a class="btn primary" href="{{ site.resume_path }}" target="_blank" rel="noopener">Résumé (PDF)</a>
+    <a class="btn" href="mailto:{{ site.email }}">{{ site.email }}</a>
+    {% for label, url in site.links.items() %}
+      <a class="btn ghost" href="{{ url }}" target="_blank" rel="noopener">{{ label }}</a>
+    {% endfor %}
+  </div>
+  <p class="loc mono">{{ site.location }}</p>
+</section>
+
+<section id="projects">
+  <h2>Projects</h2>
+  <div class="grid">
+    {% for p in projects %}
+    <article class="card">
+      <h3>{{ p.name }}{% if p.team %} <span class="pill">team</span>{% endif %}</h3>
+      <p>{{ p.blurb }}</p>
+      <ul class="dots">
+        {% for h in p.highlights %}<li>{{ h }}</li>{% endfor %}
+      </ul>
+      <p class="stack mono">{{ p.stack | join(" · ") }}</p>
+      <a class="src" href="{{ p.repo }}" target="_blank" rel="noopener">source →</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section id="experience">
+  <h2>Experience</h2>
+  {% for e in experience %}
+  <div class="row">
+    <div class="row-head">
+      <strong>{{ e.role }}</strong> · {{ e.company }}
+      <span class="mono muted">{{ e.period }} — {{ e.location }}</span>
+    </div>
+    <ul class="dots">{% for pt in e.points %}<li>{{ pt }}</li>{% endfor %}</ul>
+  </div>
+  {% endfor %}
+
+  <h2 class="sub">Education</h2>
+  {% for ed in education %}
+  <div class="row compact">
+    <strong>{{ ed.what }}</strong> · {{ ed.where }}
+    <span class="mono muted">{{ ed.period }} · {{ ed.note }}</span>
+  </div>
+  {% endfor %}
+
+  <h2 class="sub">Achievements</h2>
+  <ul class="dots">{% for a in achievements %}<li>{{ a }}</li>{% endfor %}</ul>
+</section>
+
+<section id="stack">
+  <h2>Stack</h2>
+  <div class="stack-grid mono">
+    <div><span class="muted">languages</span><br />Python · Java · C++ · SQL</div>
+    <div><span class="muted">backend</span><br />FastAPI · REST · JWT/OAuth · Microservices · Docker · Linux</div>
+    <div><span class="muted">data</span><br />PostgreSQL · MySQL · SQL Server · Redis · ChromaDB · ETL pipelines</div>
+    <div><span class="muted">ai / ml</span><br />scikit-learn · TensorFlow · LangChain · RAG · Reinforcement Learning · Feature Engineering</div>
+    <div><span class="muted">core cs</span><br />DSA · Operating Systems · OOP · DBMS · Computer Networks</div>
+    <div><span class="muted">tools</span><br />Git · GitHub · Linux · VS Code</div>
+  </div>
+  <p class="note mono">This site is itself a FastAPI app — a live dashboard, semantic project search and a
+  RAG "ask my portfolio" chatbot are shipping next. <a href="/api">See the API →</a></p>
+</section>
+{% endblock %}
