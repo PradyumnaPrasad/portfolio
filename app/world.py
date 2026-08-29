@@ -1,8 +1,8 @@
-"""The portfolio as a small top-down RPG world.
+"""The portfolio as a small top-down RPG village.
 
-Each structure is a building you can walk into; its `detail` is the quest log
-shown when you enter. Terrain is a tile string, all derived so `app.content`
-stays the single source of truth.
+Each structure is a building you walk into; its `detail` is the quest log
+shown on entry. Terrain and paths are generated so `app.content` stays the
+single source of truth.
 """
 
 from __future__ import annotations
@@ -10,31 +10,47 @@ from __future__ import annotations
 from app import content
 from app.config import SITE
 
-# T = tree, ~ = water, . = grass. Border only; the interior is open.
-TERRAIN = [
-    "TT~~~~~~~~~~~~~~~~TT",
-    "T..................T",
-    "T..................T",
-    "T..................T",
-    "~..................~",
-    "~..................~",
-    "~..................~",
-    "T..................T",
-    "T..................T",
-    "T..................T",
-    "T..................T",
-    "TT~~~~~~~~~~~~~~~~TT",
-]
+COLS, ROWS = 21, 16
+_PROJ = {p["slug"]: p for p in content.PROJECTS}
 
-# decorative trees (also solid) placed clear of buildings and their door mats
-DECOR_TREES = [(7, 2), (12, 2), (7, 7), (12, 7), (2, 10), (17, 10)]
+
+def _terrain() -> list[str]:
+    rows = []
+    for y in range(ROWS):
+        line = []
+        for x in range(COLS):
+            edge_x = x == 0 or x == COLS - 1
+            edge_y = y == 0 or y == ROWS - 1
+            if edge_y:
+                line.append("T" if x < 2 or x >= COLS - 2 else "~")
+            elif edge_x:
+                line.append("~" if 5 <= y <= 10 else "T")
+            else:
+                line.append(".")
+        rows.append("".join(line))
+    return rows
+
+
+def _paths() -> list[list[int]]:
+    tiles: set[tuple[int, int]] = set()
+    for x in (4, 10, 16):
+        for y in range(3, 15):
+            tiles.add((x, y))
+    for x in (7, 13):
+        for y in range(11, 15):
+            tiles.add((x, y))
+    for y in (3, 7, 11, 14):
+        for x in range(4, 17):
+            tiles.add((x, y))
+    return sorted([x, y] for x, y in tiles)
 
 
 def _proj(slug: str, roof: str, short: str) -> dict:
-    p = {x["slug"]: x for x in content.PROJECTS}[slug]
+    p = _PROJ[slug]
     return {
         "roof": roof,
         "name": short,
+        "icon": "house",
         "detail": {
             "kind": "project",
             "title": p["name"],
@@ -52,13 +68,13 @@ def build_world() -> dict:
     e = content.EXPERIENCE[0]
     ach = {a["label"]: a["text"] for a in content.ACHIEVEMENTS}
 
-    # x, y is the building tile; the door mat is (x, y + 1)
     structures = [
         {
-            "x": 3,
+            "x": 4,
             "y": 2,
             "roof": "#c9a24a",
             "name": "Home",
+            "icon": "home",
             "detail": {
                 "kind": "home base",
                 "title": SITE["name"],
@@ -68,34 +84,49 @@ def build_world() -> dict:
                     for x in content.EDUCATION
                 ],
                 "meta": SITE["location"],
-                "links": SITE["links"] | {"Résumé": SITE["resume_path"]},
             },
         },
         {
-            "x": 15,
+            "x": 10,
             "y": 2,
             "roof": "#4a86c9",
             "name": "Hexango HQ",
+            "icon": "guild",
             "detail": {
-                "kind": "guild — internship",
+                "kind": "guild · internship",
                 "title": f"{e['role']} · {e['company']}",
                 "body": f"{e['period']} — {e['location']}",
                 "objectives": e["points"],
                 "loot": ["PostgreSQL", "SQL Server", "PL/pgSQL", "ETL", "Python"],
             },
         },
-        {"x": 3, "y": 5, **_proj("neuromentor", "#c14a3a", "NeuroMentor")},
-        {"x": 9, "y": 5, **_proj("dual-insight-engine", "#8a4ac1", "Dual Insight")},
-        {"x": 15, "y": 5, **_proj("ai-resume-maker", "#3aa38a", "AI Resume Maker")},
-        {"x": 3, "y": 8, **_proj("distributed-web-scraper", "#7a7a3a", "Web Scraper")},
-        {"x": 8, "y": 8, **_proj("isl-gesture-detection", "#c17a3a", "Gesture ISL")},
         {
-            "x": 15,
-            "y": 8,
+            "x": 16,
+            "y": 2,
+            "roof": "#8a4ac1",
+            "name": "Post Office",
+            "icon": "mail",
+            "detail": {
+                "kind": "get in touch",
+                "title": "Post Office",
+                "body": "Send a raven. Fastest reply by email.",
+                "meta": SITE["email"],
+                "links": SITE["links"] | {"Résumé": SITE["resume_path"]},
+            },
+        },
+        {"x": 4, "y": 6, **_proj("neuromentor", "#c14a3a", "NeuroMentor")},
+        {"x": 10, "y": 6, **_proj("dual-insight-engine", "#3aa38a", "Dual Insight")},
+        {"x": 16, "y": 6, **_proj("ai-resume-maker", "#d08a2c", "AI Resume Maker")},
+        {"x": 4, "y": 10, **_proj("distributed-web-scraper", "#7a7a3a", "Web Scraper")},
+        {"x": 10, "y": 10, **_proj("isl-gesture-detection", "#c17ad0", "Gesture ISL")},
+        {
+            "x": 16,
+            "y": 10,
             "roof": "#d4b23a",
             "name": "Trophy Hall",
+            "icon": "trophy",
             "detail": {
-                "kind": "achievements",
+                "kind": "hall of fame",
                 "title": "Trophy Hall",
                 "objectives": [
                     ach["MIT Hackathon '25"],
@@ -106,32 +137,30 @@ def build_world() -> dict:
             },
         },
         {
-            "x": 12,
-            "y": 8,
+            "x": 7,
+            "y": 13,
             "roof": "#5a9c5a",
             "name": "Workshop",
+            "icon": "hammer",
             "detail": {
-                "kind": "what's next",
+                "kind": "under construction",
                 "title": "The Workshop",
-                "body": "Being built onto this very site:",
+                "body": "Being forged onto this very site:",
                 "objectives": [
                     "A live data dashboard — GitHub activity ETL, refreshed nightly.",
                     "Semantic project search over pgvector.",
                     "A RAG 'ask my portfolio' chatbot on Gemini.",
                 ],
-                "meta": SITE["email"],
-                "links": SITE["links"],
             },
         },
     ]
 
-    # a stat pad (walk onto it) rather than a building
     pad = {
-        "x": 6,
-        "y": 10,
+        "x": 13,
+        "y": 13,
         "detail": {
             "kind": "skill tree",
-            "title": "Skill tree",
+            "title": "Skill Tree",
             "stats": [
                 ["Backend", 9],
                 ["Data / SQL", 8],
@@ -158,13 +187,27 @@ def build_world() -> dict:
     }
 
     return {
-        "cols": len(TERRAIN[0]),
-        "rows": len(TERRAIN),
-        "terrain": TERRAIN,
-        "trees": DECOR_TREES,
+        "cols": COLS,
+        "rows": ROWS,
+        "terrain": _terrain(),
+        "paths": _paths(),
+        "trees": [
+            [2, 4],
+            [18, 4],
+            [2, 9],
+            [18, 9],
+            [2, 12],
+            [18, 12],
+            [6, 4],
+            [14, 4],
+            [6, 12],
+            [14, 12],
+            [9, 12],
+            [15, 12],
+        ],
         "structures": structures,
         "pad": pad,
-        "start": {"x": 9, "y": 10},
+        "start": {"x": 10, "y": 14},
         "title": SITE["name"],
         "tagline": SITE["tagline"],
     }
