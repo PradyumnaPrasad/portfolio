@@ -1,4 +1,5 @@
 # Render Blueprint. In the Render dashboard: New → Blueprint → point at this repo.
+# The database is external (Neon free tier) — set DATABASE_URL in the dashboard.
 services:
   - type: web
     name: pradyumna-portfolio
@@ -6,6 +7,7 @@ services:
     plan: free
     region: singapore
     buildCommand: pip install -r requirements.txt
+    preDeployCommand: alembic upgrade head
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /healthz
     autoDeploy: true
@@ -14,3 +16,5 @@ services:
         value: "3.12.7"
       - key: APP_ENV
         value: production
+      - key: DATABASE_URL
+        sync: false   # paste the Neon connection string in the Render dashboard

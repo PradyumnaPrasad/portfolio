@@ -17,4 +17,6 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: ruff check .
       - run: ruff format --check .
+      - run: alembic upgrade head        # migrations apply cleanly (SQLite)
+      - run: alembic check               # no un-generated schema drift
       - run: pytest

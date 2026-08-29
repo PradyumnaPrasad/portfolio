@@ -1,19 +1,20 @@
 # pradyumnaprasad.dev
 
-My portfolio, built as a live application rather than a static page. It is a
-FastAPI service that server-renders its own content and will grow a data
-dashboard, semantic project search, and a RAG "ask my portfolio" chatbot.
+My portfolio, built as a live application rather than a static page. The
+landing is a small top-down RPG village (hand-written canvas tile engine);
+each building opens a "quest log" with that section's content. A plain
+server-rendered text version is the no-JS / SEO fallback.
 
 ## Stack
 
 | Layer      | Choice |
 |------------|--------|
 | Backend    | FastAPI (Python 3.12) |
-| Frontend   | Jinja templates + hand-written CSS (dark-first), HTMX for live bits |
-| Database   | Neon Postgres + pgvector *(Phase 2+)* |
+| Frontend   | Jinja + hand-written CSS + a canvas tile engine, VT323 / Press Start 2P |
+| Database   | SQLite locally · Postgres (Neon) in prod · SQLAlchemy 2.0 + Alembic |
 | Queue/cache| Upstash Redis *(Phase 3+)* |
 | LLM        | Google Gemini API — free tier *(Phase 4)* |
-| Embeddings | sentence-transformers, run locally *(Phase 4)* |
+| Embeddings | sentence-transformers + pgvector *(Phase 4)* |
 | Hosting    | Render free web service, via `render.yaml` blueprint |
 | CI         | GitHub Actions — ruff + pytest |
 
@@ -22,7 +23,8 @@ dashboard, semantic project search, and a RAG "ask my portfolio" chatbot.
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
-uvicorn app.main:app --reload
+alembic upgrade head          # creates portfolio.db (SQLite)
+uvicorn app.main:app --reload # seeds content from app/content.py on startup
 # http://127.0.0.1:8000  ·  API docs at /api
 ```
 
@@ -30,15 +32,31 @@ uvicorn app.main:app --reload
 ruff check . && ruff format --check . && pytest
 ```
 
+## Content
+
+`app/content.py` is the human-editable source of truth. On every startup
+`app/seed.py` upserts it into the database; the app reads from the DB via
+`app/repo.py`. Schema changes go through Alembic:
+
+```bash
+alembic revision --autogenerate -m "what changed"
+alembic upgrade head
+```
+
 ## Deploy
 
-Push to GitHub, then in Render: **New → Blueprint → select this repo**.
-`render.yaml` provisions the web service; `autoDeploy` ships every push to `main`.
+1. Create a free Postgres database at [neon.tech], copy its connection string.
+2. In Render: **New → Blueprint → select this repo**.
+3. Set `DATABASE_URL` (the Neon string) in the service's Environment tab.
+
+`render.yaml` runs `alembic upgrade head` before each deploy; `autoDeploy`
+ships every push to `main`.
 
 ## Roadmap
 
 - [x] **Phase 1** — live skeleton: home page, health check, CI, Render blueprint
-- [ ] **Phase 2** — Postgres-backed content; project detail pages
-- [ ] **Phase 3** — GitHub-activity ETL + dashboard; site analytics panel
-- [ ] **Phase 4** — pgvector semantic search + Gemini RAG chatbot + scikit-learn demo
+- [x] **Phase 2** — database layer: SQLAlchemy models, Alembic migrations,
+      content served from the DB, persistent page-view analytics
+- [ ] **Phase 3** — GitHub-activity ETL + a dashboard building; analytics panel
+- [ ] **Phase 4** — pgvector semantic search + Gemini RAG chatbot + a classical ML demo
 - [ ] **Phase 5** — SEO, sitemap, custom domain, architecture diagram

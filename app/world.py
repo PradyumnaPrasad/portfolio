@@ -1,17 +1,18 @@
 """The portfolio as a small top-down RPG village.
 
 Each structure is a building you walk into; its `detail` is the quest log
-shown on entry. Terrain and paths are generated so `app.content` stays the
-single source of truth.
+shown on entry. Content comes from the database (see `app.repo`); terrain and
+paths are generated.
 """
 
 from __future__ import annotations
 
-from app import content
+from sqlalchemy.orm import Session
+
+from app import repo
 from app.config import SITE
 
 COLS, ROWS = 21, 16
-_PROJ = {p["slug"]: p for p in content.PROJECTS}
 
 
 def _terrain() -> list[str]:
@@ -45,8 +46,8 @@ def _paths() -> list[list[int]]:
     return sorted([x, y] for x, y in tiles)
 
 
-def _proj(slug: str, roof: str, short: str) -> dict:
-    p = _PROJ[slug]
+def _proj(by_slug: dict, slug: str, roof: str, short: str) -> dict:
+    p = by_slug[slug]
     return {
         "roof": roof,
         "name": short,
@@ -64,9 +65,15 @@ def _proj(slug: str, roof: str, short: str) -> dict:
     }
 
 
-def build_world() -> dict:
-    e = content.EXPERIENCE[0]
-    ach = {a["label"]: a["text"] for a in content.ACHIEVEMENTS}
+def build_world(db: Session) -> dict:
+    by_slug = {p["slug"]: p for p in repo.projects(db)}
+    exp = repo.experience(db)
+    e = exp[0] if exp else {"role": "", "company": "", "period": "", "location": "", "points": []}
+    ach = {a["label"]: a["text"] for a in repo.achievements(db)}
+    edu = repo.education(db)
+
+    def P(slug, roof, short):
+        return _proj(by_slug, slug, roof, short)
 
     structures = [
         {
@@ -80,8 +87,7 @@ def build_world() -> dict:
                 "title": SITE["name"],
                 "body": SITE["tagline"],
                 "objectives": [
-                    f"{x['what']} · {x['where']} ({x['period']}) — {x['note']}"
-                    for x in content.EDUCATION
+                    f"{x['what']} · {x['where']} ({x['period']}) — {x['note']}" for x in edu
                 ],
                 "meta": SITE["location"],
             },
@@ -114,11 +120,11 @@ def build_world() -> dict:
                 "links": SITE["links"] | {"Résumé": SITE["resume_path"]},
             },
         },
-        {"x": 4, "y": 6, **_proj("neuromentor", "#c14a3a", "NeuroMentor")},
-        {"x": 10, "y": 6, **_proj("dual-insight-engine", "#3aa38a", "Dual Insight")},
-        {"x": 16, "y": 6, **_proj("ai-resume-maker", "#d08a2c", "AI Resume Maker")},
-        {"x": 4, "y": 10, **_proj("distributed-web-scraper", "#7a7a3a", "Web Scraper")},
-        {"x": 10, "y": 10, **_proj("isl-gesture-detection", "#c17ad0", "Gesture ISL")},
+        {"x": 4, "y": 6, **P("neuromentor", "#c14a3a", "NeuroMentor")},
+        {"x": 10, "y": 6, **P("dual-insight-engine", "#3aa38a", "Dual Insight")},
+        {"x": 16, "y": 6, **P("ai-resume-maker", "#d08a2c", "AI Resume Maker")},
+        {"x": 4, "y": 10, **P("distributed-web-scraper", "#7a7a3a", "Web Scraper")},
+        {"x": 10, "y": 10, **P("isl-gesture-detection", "#c17ad0", "Gesture ISL")},
         {
             "x": 16,
             "y": 10,
