@@ -69,7 +69,6 @@ def build_world(db: Session) -> dict:
     by_slug = {p["slug"]: p for p in repo.projects(db)}
     exp = repo.experience(db)
     e = exp[0] if exp else {"role": "", "company": "", "period": "", "location": "", "points": []}
-    ach = {a["label"]: a["text"] for a in repo.achievements(db)}
     edu = repo.education(db)
 
     snap = repo.get_snapshot(db)
@@ -155,12 +154,7 @@ def build_world(db: Session) -> dict:
             "detail": {
                 "kind": "hall of fame",
                 "title": "Trophy Hall",
-                "objectives": [
-                    ach["NMIT Hackathon '25"],
-                    ach["SIT Pitchathon"],
-                    ach["400+ DSA"],
-                    ach["AI Brewery Lead"],
-                ],
+                "objectives": [a["text"] for a in repo.achievements(db)],
             },
         },
         {
