@@ -252,6 +252,21 @@ footer a { color: var(--link); }
 .pages .pc { display: inline-block; min-width: 2.5rem; color: var(--gold); }
 #dash code { font-family: var(--mono); font-size: .8rem; background: var(--parch-lo); padding: 0 .3rem; }
 
+/* ---- workshop (/workshop) ---- */
+.wform { display: flex; gap: .5rem; margin: .8rem 0; }
+.wform input { flex: 1; font-family: var(--vt); font-size: 1.05rem; padding: .4rem .7rem; background: var(--parch-lo); border: 2px solid var(--wood); color: var(--ink); border-radius: 3px; }
+.wform input:focus { outline: none; border-color: var(--gold); }
+.wout { margin-top: .6rem; }
+.wout .hit { border-top: 1px solid var(--wood); padding: .7rem 0; }
+.wout .hit:first-child { border-top: none; }
+.wout .hit p { font-size: 1rem; margin: .3rem 0; }
+.wout .answer { font-size: 1.15rem; line-height: 1.55; margin-bottom: .7rem; }
+.suggest { margin-bottom: .3rem; }
+.suggest button { font-family: var(--vt); font-size: .95rem; background: var(--parch-lo); border: 2px solid var(--wood); color: var(--ink); padding: .12rem .5rem; border-radius: 3px; cursor: pointer; }
+.suggest button:hover { border-color: var(--gold); color: var(--gold); }
+a.chip { text-decoration: none; }
+a.chip:hover { border-color: var(--gold); color: var(--gold); }
+
 @media (prefers-reduced-motion: reduce) {
   #titlecard, #quest { transition: none; }
   .tc-go { animation: none; }

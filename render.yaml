@@ -18,6 +18,8 @@ services:
         value: production
       - key: DATABASE_URL
         sync: false   # paste the Neon connection string in the dashboard
+      - key: GEMINI_API_KEY
+        sync: false   # optional — enables the "ask my portfolio" chatbot + semantic search
 
   - type: cron
     name: portfolio-github-etl

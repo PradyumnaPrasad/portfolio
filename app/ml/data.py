@@ -1,0 +1,48 @@
+"""Tiny labelled set for the domain classifier demo.
+
+Short phrases → one of five software areas. Small on purpose: the point is to
+show a train → serve loop, not to win a benchmark.
+"""
+
+SAMPLES: list[tuple[str, str]] = [
+    ("REST API with FastAPI and JWT authentication", "backend"),
+    ("background job queue with Redis workers", "backend"),
+    ("database schema design and query optimisation", "backend"),
+    ("rate limiting and caching for a web service", "backend"),
+    ("microservice that processes webhook events", "backend"),
+    ("pagination, filtering and error handling for an endpoint", "backend"),
+    ("gRPC service with protobuf contracts", "backend"),
+    ("session management and password hashing", "backend"),
+    ("train a text classifier with scikit-learn", "machine-learning"),
+    ("fine-tune a transformer for sentiment analysis", "machine-learning"),
+    ("retrieval augmented generation over documents", "machine-learning"),
+    ("reinforcement learning agent with Q-learning", "machine-learning"),
+    ("build embeddings and a vector search index", "machine-learning"),
+    ("convolutional network for image classification", "machine-learning"),
+    ("prompt engineering and LLM evaluation", "machine-learning"),
+    ("feature engineering and model cross-validation", "machine-learning"),
+    ("ETL pipeline moving data between warehouses", "data"),
+    ("clean and normalise a messy CSV dataset", "data"),
+    ("aggregate metrics and build a reporting dashboard", "data"),
+    ("SQL Server to PostgreSQL migration", "data"),
+    ("synthetic data generator with referential integrity", "data"),
+    ("nightly batch job that refreshes analytics tables", "data"),
+    ("dbt models and incremental materialisations", "data"),
+    ("pandas transformations over a large dataframe", "data"),
+    ("responsive layout with CSS grid and flexbox", "frontend"),
+    ("React component with hooks and state management", "frontend"),
+    ("accessible forms with keyboard navigation", "frontend"),
+    ("client-side routing and code splitting", "frontend"),
+    ("animation and transitions in the browser", "frontend"),
+    ("design system with reusable UI components", "frontend"),
+    ("server-rendered pages with progressive enhancement", "frontend"),
+    ("charts and data visualisation on canvas", "frontend"),
+    ("Dockerfile and multi-stage container build", "infrastructure"),
+    ("CI pipeline running tests and linters", "infrastructure"),
+    ("Kubernetes deployment with health checks", "infrastructure"),
+    ("Terraform for cloud infrastructure as code", "infrastructure"),
+    ("blue-green deploy with automatic rollback", "infrastructure"),
+    ("observability with structured logging and metrics", "infrastructure"),
+    ("nginx reverse proxy and TLS termination", "infrastructure"),
+    ("cron jobs and scheduled workers on a PaaS", "infrastructure"),
+]

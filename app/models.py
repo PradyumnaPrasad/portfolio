@@ -68,6 +68,20 @@ class PageView(Base):
     )
 
 
+class Chunk(Base):
+    """A retrievable snippet of portfolio content for search and the chatbot."""
+
+    __tablename__ = "chunks"
+
+    key: Mapped[str] = mapped_column(String(120), primary_key=True)
+    kind: Mapped[str] = mapped_column(String(32), default="")
+    title: Mapped[str] = mapped_column(String(160), default="")
+    ref: Mapped[str] = mapped_column(String(255), default="")
+    text: Mapped[str] = mapped_column(Text, default="")
+    content_hash: Mapped[str] = mapped_column(String(16), default="")
+    embedding: Mapped[list | None] = mapped_column(JSON, nullable=True)
+
+
 class DashboardSnapshot(Base):
     """A cached GitHub-activity snapshot. One row (id=1), refreshed by the ETL."""
 

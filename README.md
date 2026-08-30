@@ -62,5 +62,8 @@ ships every push to `main`.
       (submission calendar, solves by difficulty/language, contest rating) +
       GitHub (languages, repo cadence, timeline). The Observatory building →
       `/dashboard`, plus this site's own traffic.
-- [ ] **Phase 4** — pgvector semantic search + Gemini RAG chatbot + a classical ML demo
+- [x] **Phase 4** — the Workshop building → `/workshop`: semantic search over
+      portfolio content (Gemini embeddings, keyword fallback), a RAG
+      "ask my portfolio" chatbot (Gemini free tier), and a small scikit-learn
+      domain classifier. All degrade gracefully without `GEMINI_API_KEY`.
 - [ ] **Phase 5** — SEO, sitemap, custom domain, architecture diagram

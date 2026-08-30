@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}The Workshop — {{ site.name }}{% endblock %}
+
+{% block content %}
+<div id="dash">
+  <header class="dash-head">
+    <a class="back vt" href="/">← back to the map</a>
+    <h1 class="press">The Workshop</h1>
+    <p class="vt muted">Three tools running on this site — semantic search, a RAG chatbot, and a small classifier.</p>
+  </header>
+
+  <section class="panel wtool" id="tool-search">
+    <h2 class="press">Search my work <span class="src" data-mode>·</span></h2>
+    <form class="wform" data-endpoint="/api/search">
+      <input name="q" class="vt" type="search" placeholder="e.g. reinforcement learning, ETL, FastAPI auth" autocomplete="off" />
+      <button class="gbtn" type="submit">search</button>
+    </form>
+    <div class="wout vt" data-out></div>
+  </section>
+
+  <section class="panel wtool" id="tool-ask">
+    <h2 class="press">Ask my portfolio</h2>
+    {% if not chat_enabled %}
+    <p class="vt warn">The chatbot needs a <code>GEMINI_API_KEY</code>. Search above still works; it shows the passages the bot would use.</p>
+    {% endif %}
+    <div class="chips suggest vt">
+      <button type="button">Has he done ETL work?</button>
+      <button type="button">What did he build with reinforcement learning?</button>
+      <button type="button">Tell me about the RAG project.</button>
+    </div>
+    <form class="wform" data-endpoint="/api/ask" data-method="post">
+      <input name="question" class="vt" type="text" placeholder="Ask a question about Pradyumna…" autocomplete="off" />
+      <button class="gbtn" type="submit">ask</button>
+    </form>
+    <div class="wout vt" data-out></div>
+  </section>
+
+  <section class="panel wtool" id="tool-clf">
+    <h2 class="press">Guess the domain</h2>
+    <p class="vt muted">TF-IDF + logistic regression, trained in-process on ~40 phrases. Paste any task description.</p>
+    <form class="wform" data-endpoint="/api/ml/classify" data-method="post">
+      <input name="text" class="vt" type="text" placeholder="e.g. build a container image and a CI pipeline" autocomplete="off" />
+      <button class="gbtn" type="submit">classify</button>
+    </form>
+    <div class="wout vt" data-out></div>
+  </section>
+</div>
+<script src="/static/js/workshop.js" defer></script>
+{% endblock %}

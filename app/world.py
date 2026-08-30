@@ -170,14 +170,16 @@ def build_world(db: Session) -> dict:
             "name": "Workshop",
             "icon": "hammer",
             "detail": {
-                "kind": "under construction",
+                "kind": "live tools",
                 "title": "The Workshop",
-                "body": "Being forged onto this very site:",
+                "body": "Three things running on this site:",
                 "objectives": [
-                    "Semantic project search over pgvector.",
-                    "A RAG 'ask my portfolio' chatbot on Gemini.",
-                    "A small classical-ML demo you can poke at.",
+                    "Semantic search over everything in my portfolio.",
+                    "A RAG 'ask my portfolio' chatbot (Gemini).",
+                    "A small scikit-learn classifier you can poke at.",
                 ],
+                "link": "/workshop",
+                "link_label": "enter the workshop →",
             },
         },
         {
