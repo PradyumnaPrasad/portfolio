@@ -58,8 +58,9 @@ ships every push to `main`.
 - [x] **Phase 1** — live skeleton: home page, health check, CI, Render blueprint
 - [x] **Phase 2** — database layer: SQLAlchemy models, Alembic migrations,
       content served from the DB, persistent page-view analytics
-- [x] **Phase 3** — GitHub-activity ETL (`python -m app.etl`, nightly cron),
-      the Observatory building + `/dashboard` (languages, repo cadence, repo
-      timeline, this site's traffic)
+- [x] **Phase 3** — activity ETL (`python -m app.etl`, nightly cron): LeetCode
+      (submission calendar, solves by difficulty/language, contest rating) +
+      GitHub (languages, repo cadence, timeline). The Observatory building →
+      `/dashboard`, plus this site's own traffic.
 - [ ] **Phase 4** — pgvector semantic search + Gemini RAG chatbot + a classical ML demo
 - [ ] **Phase 5** — SEO, sitemap, custom domain, architecture diagram

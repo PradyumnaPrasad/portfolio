@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block title %}The Observatory — {{ site.name }}{% endblock %}
 
+{% macro bars(rows) %}
+<div class="bars">
+  {% for l in rows %}
+  <div class="langrow">
+    <span class="vt lname">{{ l.name }}</span>
+    <span class="track"><i style="width: {{ l.pct }}%; background: {{ l.color }};"></i></span>
+    <span class="vt lpct">{{ l.count }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
 {% block content %}
 <div id="dash">
   <header class="dash-head">
@@ -8,7 +20,7 @@
     <h1 class="press">The Observatory</h1>
     {% if not d.empty %}
     <p class="vt muted">
-      GitHub activity, refreshed nightly · calendar via {{ d.calendar_source }}
+      LeetCode &amp; GitHub activity, refreshed nightly
       {%- if d.stale %} · <span class="warn">snapshot is stale</span>{% endif %}
     </p>
     {% endif %}
@@ -31,39 +43,23 @@
     {% endfor %}
   </section>
 
+  {% if d.difficulty %}
   <section class="panel">
-    <h2 class="press">Languages</h2>
-    <div class="bars">
-      {% for l in d.languages %}
-      <div class="langrow">
-        <span class="vt lname">{{ l.name }}</span>
-        <span class="track"><i style="width: {{ l.pct }}%; background: {{ l.color }};"></i></span>
-        <span class="vt lpct">{{ l.pct }}%</span>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
-
-  {% if d.months %}
-  <section class="panel">
-    <h2 class="press">Repositories started per month</h2>
-    <div class="monthbars">
-      {% for m in d.months %}
-      <span class="mb" title="{{ m.month }} · {{ m.count }}"><i style="height: {{ m.pct }}%;"></i><em>{{ m.label }}</em></span>
-      {% endfor %}
-    </div>
+    <h2 class="press">Solved by difficulty</h2>
+    {{ bars(d.difficulty) }}
+    {% if d.contest %}
+    <p class="vt muted">Contest: {{ d.contest.contests }} rounds · rating {{ d.contest.rating }} · top {{ d.contest.top_percent }}%</p>
+    {% endif %}
   </section>
   {% endif %}
 
   {% if d.heatmap %}
   <section class="panel">
-    <h2 class="press">Commit calendar</h2>
+    <h2 class="press">Submission calendar <span class="src">· leetcode.com/u/{{ d.lc_username }}</span></h2>
     <div class="heatmap">
       {% for week in d.heatmap %}
       <div class="wk">
-        {% for day in week %}
-        <span class="cell l{{ day.level }}" title="{{ day.date }} · {{ day.count }}"></span>
-        {% endfor %}
+        {% for day in week %}<span class="cell l{{ day.level }}" title="{{ day.date }} · {{ day.count }}"></span>{% endfor %}
       </div>
       {% endfor %}
     </div>
@@ -72,25 +68,37 @@
       <span class="cell l3"></span><span class="cell l4"></span><span>more</span>
     </div>
   </section>
-  {% elif d.no_calendar %}
-  <section class="panel vt muted">
-    Commit calendar needs a <code>GITHUB_TOKEN</code> (the public events feed is empty).
-    Set one on the ETL cron job to show a full year of contributions.
+  {% endif %}
+
+  {% if d.lc_languages %}
+  <section class="panel">
+    <h2 class="press">Solutions by language</h2>
+    {{ bars(d.lc_languages) }}
   </section>
   {% endif %}
 
+  {% if d.gh_languages %}
   <section class="panel">
-    <h2 class="press">Repository timeline</h2>
+    <h2 class="press">Projects on GitHub</h2>
+    {{ bars(d.gh_languages) }}
+    {% if d.months %}
+    <h3 class="vt subh">repositories started per month</h3>
+    <div class="monthbars">
+      {% for m in d.months %}
+      <span class="mb" title="{{ m.month }} · {{ m.count }}"><i style="height: {{ m.pct }}%;"></i><em>{{ m.label }}</em></span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if d.timeline %}
     <ul class="timeline vt">
       {% for r in d.timeline %}
-      <li>
-        <span class="yr">{{ r.year }}</span>
-        <span class="rn">{{ r.name }}</span>
-        <span class="muted">{{ r.language or "—" }}{% if r.stars %} · ★{{ r.stars }}{% endif %}</span>
-      </li>
+      <li><span class="yr">{{ r.year }}</span><span class="rn">{{ r.name }}</span>
+        <span class="muted">{{ r.language or "—" }}{% if r.stars %} · ★{{ r.stars }}{% endif %}</span></li>
       {% endfor %}
     </ul>
+    {% endif %}
   </section>
+  {% endif %}
 
   {% endif %}
 

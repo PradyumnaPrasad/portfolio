@@ -1,4 +1,5 @@
-"""Shape the stored GitHub snapshot + this site's traffic for the dashboard page."""
+"""Shape the stored activity snapshot (LeetCode + GitHub) + this site's traffic
+for the /dashboard page."""
 
 from __future__ import annotations
 
@@ -11,32 +12,45 @@ from app import repo
 
 LANG_COLOR = {
     "Python": "#3572A5",
+    "Java": "#B07219",
     "TypeScript": "#3178C6",
     "JavaScript": "#F1E05A",
     "Jupyter Notebook": "#DA5B0B",
-    "HTML": "#E34C26",
-    "CSS": "#563D7C",
-    "Java": "#B07219",
+    "SQL": "#e38c00",
     "C++": "#F34B7D",
-    "C": "#555555",
+    "C": "#8a8a8a",
+    "HTML": "#E34C26",
     "Shell": "#89E051",
-    "Dockerfile": "#384D54",
 }
 _FALLBACK = ["#8b5cf6", "#22d3ee", "#f472b6", "#fbbf24", "#34d399", "#f87171"]
+DIFF_COLOR = {"Easy": "#37b24d", "Medium": "#f59f00", "Hard": "#e03131"}
 
 
 def _color(name: str, i: int) -> str:
     return LANG_COLOR.get(name) or _FALLBACK[i % len(_FALLBACK)]
 
 
+def _bars(items: list[dict]) -> list[dict]:
+    total = sum(x["count"] for x in items) or 1
+    return [
+        {
+            "name": x["name"],
+            "count": x["count"],
+            "pct": round(x["count"] / total * 100),
+            "color": _color(x["name"], i),
+        }
+        for i, x in enumerate(items)
+    ]
+
+
 def _heatmap(calendar: list[dict]) -> list[list[dict]]:
-    """Group the daily calendar into columns of 7 (Sun..Sat), newest last."""
+    """Group the daily calendar into columns of 7 (Sun..Sat), oldest first."""
     if not calendar:
         return []
     by_date = {c["date"]: c["count"] for c in calendar}
     start = datetime.fromisoformat(calendar[0]["date"]).date()
     end = datetime.fromisoformat(calendar[-1]["date"]).date()
-    start -= timedelta(days=(start.weekday() + 1) % 7)  # back to a Sunday
+    start -= timedelta(days=(start.weekday() + 1) % 7)
     peak = max((c["count"] for c in calendar), default=0) or 1
 
     weeks, day = [], start
@@ -52,7 +66,6 @@ def _heatmap(calendar: list[dict]) -> list[list[dict]]:
 
 
 def _months(repos_by_month: list[dict], span: int = 24) -> list[dict]:
-    """A gap-filled monthly series of 'repositories started', most recent `span`."""
     if not repos_by_month:
         return []
     counts = {r["month"]: r["count"] for r in repos_by_month}
@@ -67,7 +80,7 @@ def _months(repos_by_month: list[dict], span: int = 24) -> list[dict]:
     peak = max((s["count"] for s in series), default=0) or 1
     for s in series:
         s["pct"] = round(s["count"] / peak * 100)
-        s["label"] = s["month"][2:]  # YY-MM
+        s["label"] = s["month"][2:]
     return series
 
 
@@ -75,58 +88,58 @@ def build_dashboard(db: Session) -> dict:
     snap = repo.get_snapshot(db)
     traffic_total = repo.view_totals(db)["total"]
     top = repo.top_pages(db)
+    traffic = {"total": traffic_total, "top": top}
 
-    if snap is None or not snap.payload:
-        return {
-            "empty": True,
-            "traffic": {"total": traffic_total, "top": top},
-        }
+    p = snap.payload if snap and snap.payload else {}
+    lc = p.get("leetcode")
+    gh = p.get("github")
 
-    p = snap.payload
-    langs = p.get("languages", [])
-    lang_total = sum(x["count"] for x in langs) or 1
-    languages = [
-        {
-            "name": x["name"],
-            "count": x["count"],
-            "pct": round(x["count"] / lang_total * 100),
-            "color": _color(x["name"], i),
-        }
-        for i, x in enumerate(langs)
-    ]
+    if not lc and not gh:
+        return {"empty": True, "traffic": traffic}
 
+    out: dict = {"empty": False, "traffic": traffic}
     age = datetime.now(UTC) - snap.generated_at.replace(tzinfo=UTC)
-    total_contrib = p.get("total_contributions", 0)
-    tiles = [
-        {"label": "public repos", "value": p.get("repo_count", 0)},
-        {"label": "stars earned", "value": p.get("star_count", 0)},
-        {"label": "languages", "value": p.get("language_count", len(langs))},
-        {"label": "site views", "value": traffic_total},
-    ]
-    if total_contrib:
-        tiles.insert(3, {"label": "contributions", "value": total_contrib})
+    out["stale"] = age > timedelta(days=3)
+    out["generated_at"] = snap.generated_at.isoformat()
 
-    months = _months(p.get("repos_by_month", []))
-    heatmap = _heatmap(p.get("calendar", []))
+    tiles: list[dict] = []
+    if lc:
+        d = lc["by_difficulty"]
+        tiles += [
+            {"label": "problems solved", "value": lc["total_solved"]},
+            {"label": "day streak", "value": lc["streak"]},
+            {"label": "active days", "value": lc["active_days"]},
+        ]
+        if lc.get("contest"):
+            tiles.append({"label": "contest rating", "value": lc["contest"]["rating"]})
+        out["difficulty"] = [
+            {
+                "name": k,
+                "count": d[k],
+                "pct": round(d[k] / (lc["total_solved"] or 1) * 100),
+                "color": DIFF_COLOR[k],
+            }
+            for k in ("Easy", "Medium", "Hard")
+        ]
+        out["heatmap"] = _heatmap(lc.get("calendar", []))
+        out["lc_languages"] = _bars(lc.get("by_language", []))
+        out["contest"] = lc.get("contest")
+        out["lc_username"] = lc["username"]
 
-    return {
-        "empty": False,
-        "tiles": tiles,
-        "languages": languages,
-        "months": months,
-        "heatmap": heatmap,
-        "no_calendar": not heatmap and p.get("calendar_source") == "events",
-        "calendar_source": p.get("calendar_source", "events"),
-        "timeline": [
+    if gh:
+        tiles.append({"label": "public repos", "value": gh["repo_count"]})
+        out["gh_languages"] = _bars(gh.get("languages", []))
+        out["months"] = _months(gh.get("repos_by_month", []))
+        out["timeline"] = [
             {
                 "name": t["name"],
                 "year": t["created"][:4],
                 "language": t["language"],
                 "stars": t["stars"],
             }
-            for t in p.get("timeline", [])
-        ],
-        "traffic": {"total": traffic_total, "top": top},
-        "generated_at": snap.generated_at.isoformat(),
-        "stale": age > timedelta(days=2),
-    }
+            for t in gh.get("timeline", [])
+        ]
+
+    tiles.append({"label": "site views", "value": traffic_total})
+    out["tiles"] = tiles
+    return out

@@ -33,5 +33,7 @@ services:
         sync: false            # same Neon string as the web service
       - key: GITHUB_USERNAME
         value: PradyumnaPrasad
+      - key: LEETCODE_USERNAME
+        value: Pradyumna_Prasad
       - key: GITHUB_TOKEN
-        sync: false            # optional — unlocks the full-year contribution calendar
+        sync: false            # optional — unlocks the GitHub contribution calendar

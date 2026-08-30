@@ -73,19 +73,23 @@ def build_world(db: Session) -> dict:
     edu = repo.education(db)
 
     snap = repo.get_snapshot(db)
-    if snap and snap.payload:
-        sp = snap.payload
-        obs_lines = [
-            f"{sp.get('repo_count', 0)} public repos, {sp.get('star_count', 0)} stars earned.",
-            f"{sp.get('language_count', 0)} languages across the shelf.",
-        ]
-        if sp.get("total_contributions"):
-            obs_lines.append(f"{sp['total_contributions']} contributions on the calendar.")
-        obs_lines.append("Refreshed nightly by an ETL job. Walk in to see the charts.")
+    payload = snap.payload if snap and snap.payload else {}
+    lc, gh = payload.get("leetcode"), payload.get("github")
+    if lc or gh:
+        obs_lines = ["A live dashboard, refreshed nightly by an ETL job:"]
+        if lc:
+            c = lc.get("contest")
+            top = f", top {c['top_percent']}%" if c else ""
+            obs_lines.append(
+                f"{lc['total_solved']} LeetCode problems solved · {lc['streak']}-day streak{top}."
+            )
+        if gh:
+            obs_lines.append(f"{gh['repo_count']} public repos on GitHub.")
+        obs_lines.append("Walk in for the charts.")
     else:
         obs_lines = [
-            "A live dashboard of my GitHub activity — languages, a commit",
-            "heatmap, a repo timeline, and this site's own traffic.",
+            "A live dashboard of my coding activity — a LeetCode submission",
+            "calendar, solve counts, GitHub projects, and this site's traffic.",
             "Built by a nightly ETL job. Walk in to see it.",
         ]
 

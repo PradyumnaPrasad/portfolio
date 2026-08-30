@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-08-30T02:00:00+00:00",
+  "leetcode": {
+    "generated_at": "2026-08-30T02:00:00+00:00",
+    "username": "Pradyumna_Prasad",
+    "total_solved": 406,
+    "by_difficulty": {"Easy": 201, "Medium": 185, "Hard": 20},
+    "streak": 14,
+    "active_days": 93,
+    "ranking": 307463,
+    "calendar": [
+      {"date": "2026-08-24", "count": 0},
+      {"date": "2026-08-25", "count": 2},
+      {"date": "2026-08-26", "count": 5},
+      {"date": "2026-08-27", "count": 1},
+      {"date": "2026-08-29", "count": 8},
+      {"date": "2026-08-30", "count": 3}
+    ],
+    "by_language": [
+      {"name": "Java", "count": 336},
+      {"name": "Python", "count": 56},
+      {"name": "SQL", "count": 28},
+      {"name": "C", "count": 4}
+    ],
+    "contest": {"contests": 8, "rating": 1552, "top_percent": 32.2}
+  },
+  "github": {
+    "generated_at": "2026-08-30T02:00:00+00:00",
+    "username": "PradyumnaPrasad",
+    "repo_count": 17,
+    "star_count": 4,
+    "language_count": 4,
+    "languages": [
+      {"name": "Python", "count": 10},
+      {"name": "TypeScript", "count": 3},
+      {"name": "JavaScript", "count": 2},
+      {"name": "Jupyter Notebook", "count": 2}
+    ],
+    "repos_by_month": [
+      {"month": "2025-03", "count": 3},
+      {"month": "2025-09", "count": 1},
+      {"month": "2026-08", "count": 1}
+    ],
+    "timeline": [
+      {"name": "Pedestrian_Safety", "created": "2025-03-18", "pushed": "2025-03-18", "language": "Python", "stars": 0},
+      {"name": "Dual_Insight_Engine", "created": "2025-09-09", "pushed": "2025-09-09", "language": "Python", "stars": 0},
+      {"name": "portfolio", "created": "2026-08-29", "pushed": "2026-08-30", "language": "Python", "stars": 0}
+    ],
+    "calendar": [],
+    "total_contributions": 0,
+    "calendar_source": "events"
+  }
+}
