@@ -66,3 +66,15 @@ class PageView(Base):
     last_seen: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), onupdate=func.now()
     )
+
+
+class DashboardSnapshot(Base):
+    """A cached GitHub-activity snapshot. One row (id=1), refreshed by the ETL."""
+
+    __tablename__ = "dashboard_snapshots"
+
+    id: Mapped[int] = mapped_column(primary_key=True, default=1)
+    payload: Mapped[dict] = mapped_column(JSON, default=dict)
+    generated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )

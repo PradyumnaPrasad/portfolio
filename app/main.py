@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 
 from app import repo
 from app.config import BASE_DIR, IS_PROD, SITE
+from app.dashboard import build_dashboard
 from app.db import SessionLocal, engine, get_session
 from app.models import Base
 from app.seed import seed
@@ -72,7 +73,8 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 async def count_views(request: Request, call_next):
     response = await call_next(request)
     path = request.url.path
-    if request.method == "GET" and not path.startswith(("/static", "/healthz", "/api")):
+    counted = request.method == "GET" and not path.startswith(("/static", "/healthz", "/api"))
+    if counted and path not in ("/favicon.ico", "/robots.txt"):
         _view_buffer[path] = _view_buffer.get(path, 0) + 1
     return response
 
@@ -94,9 +96,21 @@ async def home(request: Request, db: Session = Depends(get_session)) -> HTMLResp
     )
 
 
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request, db: Session = Depends(get_session)) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request, "dashboard.html", {"site": SITE, "d": build_dashboard(db)}
+    )
+
+
 @app.get("/api/world")
 async def api_world(db: Session = Depends(get_session)) -> JSONResponse:
     return JSONResponse(build_world(db))
+
+
+@app.get("/api/dashboard")
+async def api_dashboard(db: Session = Depends(get_session)) -> JSONResponse:
+    return JSONResponse(build_dashboard(db))
 
 
 @app.get("/healthz")

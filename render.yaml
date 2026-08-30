@@ -1,5 +1,5 @@
 # Render Blueprint. In the Render dashboard: New → Blueprint → point at this repo.
-# The database is external (Neon free tier) — set DATABASE_URL in the dashboard.
+# The database is external (Neon free tier) — set DATABASE_URL on both services.
 services:
   - type: web
     name: pradyumna-portfolio
@@ -17,4 +17,21 @@ services:
       - key: APP_ENV
         value: production
       - key: DATABASE_URL
-        sync: false   # paste the Neon connection string in the Render dashboard
+        sync: false   # paste the Neon connection string in the dashboard
+
+  - type: cron
+    name: portfolio-github-etl
+    runtime: python
+    plan: free
+    schedule: "17 3 * * *"   # 03:17 UTC daily — refreshes the Observatory dashboard
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.etl
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: DATABASE_URL
+        sync: false            # same Neon string as the web service
+      - key: GITHUB_USERNAME
+        value: PradyumnaPrasad
+      - key: GITHUB_TOKEN
+        sync: false            # optional — unlocks the full-year contribution calendar

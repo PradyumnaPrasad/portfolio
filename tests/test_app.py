@@ -22,7 +22,7 @@ def test_world_is_consistent(client, db):
     w = build_world(db)
     assert w["rows"] == len(w["terrain"])
     assert all(len(row) == w["cols"] for row in w["terrain"])
-    assert len(w["structures"]) == 10
+    assert len(w["structures"]) == 11
 
     def solid(x, y):
         t = w["terrain"][y][x]

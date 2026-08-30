@@ -9,7 +9,14 @@ from __future__ import annotations
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Achievement, Education, Experience, PageView, Project
+from app.models import (
+    Achievement,
+    DashboardSnapshot,
+    Education,
+    Experience,
+    PageView,
+    Project,
+)
 
 
 def projects(db: Session) -> list[dict]:
@@ -67,3 +74,12 @@ def view_totals(db: Session) -> dict:
     rows = db.scalars(select(PageView)).all()
     views = {r.path: r.count for r in rows}
     return {"views": views, "total": sum(views.values())}
+
+
+def top_pages(db: Session, limit: int = 6) -> list[dict]:
+    rows = db.scalars(select(PageView).order_by(PageView.count.desc()).limit(limit)).all()
+    return [{"path": r.path, "count": r.count} for r in rows]
+
+
+def get_snapshot(db: Session):
+    return db.get(DashboardSnapshot, 1)

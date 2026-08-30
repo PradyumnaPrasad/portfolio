@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}The Observatory — {{ site.name }}{% endblock %}
+
+{% block content %}
+<div id="dash">
+  <header class="dash-head">
+    <a class="back vt" href="/">← back to the map</a>
+    <h1 class="press">The Observatory</h1>
+    {% if not d.empty %}
+    <p class="vt muted">
+      GitHub activity, refreshed nightly · calendar via {{ d.calendar_source }}
+      {%- if d.stale %} · <span class="warn">snapshot is stale</span>{% endif %}
+    </p>
+    {% endif %}
+  </header>
+
+  {% if d.empty %}
+  <section class="panel empty vt">
+    <p>No snapshot yet. Run the ETL to populate this page:</p>
+    <pre>python -m app.etl</pre>
+    <p class="muted">In production a nightly cron job does this automatically.</p>
+  </section>
+  {% else %}
+
+  <section class="tiles">
+    {% for t in d.tiles %}
+    <div class="tile">
+      <span class="press num">{{ t.value }}</span>
+      <span class="vt lbl">{{ t.label }}</span>
+    </div>
+    {% endfor %}
+  </section>
+
+  <section class="panel">
+    <h2 class="press">Languages</h2>
+    <div class="bars">
+      {% for l in d.languages %}
+      <div class="langrow">
+        <span class="vt lname">{{ l.name }}</span>
+        <span class="track"><i style="width: {{ l.pct }}%; background: {{ l.color }};"></i></span>
+        <span class="vt lpct">{{ l.pct }}%</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if d.months %}
+  <section class="panel">
+    <h2 class="press">Repositories started per month</h2>
+    <div class="monthbars">
+      {% for m in d.months %}
+      <span class="mb" title="{{ m.month }} · {{ m.count }}"><i style="height: {{ m.pct }}%;"></i><em>{{ m.label }}</em></span>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% if d.heatmap %}
+  <section class="panel">
+    <h2 class="press">Commit calendar</h2>
+    <div class="heatmap">
+      {% for week in d.heatmap %}
+      <div class="wk">
+        {% for day in week %}
+        <span class="cell l{{ day.level }}" title="{{ day.date }} · {{ day.count }}"></span>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="legend vt"><span>less</span>
+      <span class="cell l0"></span><span class="cell l1"></span><span class="cell l2"></span>
+      <span class="cell l3"></span><span class="cell l4"></span><span>more</span>
+    </div>
+  </section>
+  {% elif d.no_calendar %}
+  <section class="panel vt muted">
+    Commit calendar needs a <code>GITHUB_TOKEN</code> (the public events feed is empty).
+    Set one on the ETL cron job to show a full year of contributions.
+  </section>
+  {% endif %}
+
+  <section class="panel">
+    <h2 class="press">Repository timeline</h2>
+    <ul class="timeline vt">
+      {% for r in d.timeline %}
+      <li>
+        <span class="yr">{{ r.year }}</span>
+        <span class="rn">{{ r.name }}</span>
+        <span class="muted">{{ r.language or "—" }}{% if r.stars %} · ★{{ r.stars }}{% endif %}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {% endif %}
+
+  <section class="panel">
+    <h2 class="press">This site's traffic</h2>
+    <p class="vt"><span class="press num sm">{{ d.traffic.total }}</span> page views recorded</p>
+    <ul class="pages vt">
+      {% for p in d.traffic.top %}
+      <li><span class="pc">{{ p.count }}</span> <span class="pp">{{ p.path }}</span></li>
+      {% endfor %}
+    </ul>
+    <p class="vt muted">Counted first-party, no cookies. Persisted to the <code>page_views</code> table.</p>
+  </section>
+</div>
+{% endblock %}

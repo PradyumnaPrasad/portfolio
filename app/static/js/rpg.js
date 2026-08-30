@@ -92,7 +92,7 @@
     if (m) { openQuest(m.detail, m.icon); SFX.enter(); }
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  var ICON = { home: "⌂", guild: "⚑", mail: "✉", trophy: "♛", hammer: "⚒", house: "▤" };
+  var ICON = { home: "⌂", guild: "⚑", mail: "✉", trophy: "♛", hammer: "⚒", house: "▤", telescope: "✦" };
   function openQuest(d, icon) {
     var h = '<p class="qkind"><span class="qicon">' + (ICON[icon] || "◆") + "</span>" + esc(d.kind) + "</p>";
     h += "<h3>" + esc(d.title) + (d.team ? ' <span class="pill">party</span>' : "") + "</h3>";
@@ -114,7 +114,11 @@
       h += "</div>";
     }
     var links = [];
-    if (d.link) links.push('<a class="qlink" href="' + esc(d.link) + '" target="_blank" rel="noopener">' + esc(d.link_label || "open →") + "</a>");
+    if (d.link) {
+      var internal = d.link.charAt(0) === "/";
+      var tgt = internal ? "" : ' target="_blank" rel="noopener"';
+      links.push('<a class="qlink" href="' + esc(d.link) + '"' + tgt + ">" + esc(d.link_label || "open →") + "</a>");
+    }
     if (d.links) Object.keys(d.links).forEach(function (k) { links.push('<a class="qlink" href="' + esc(d.links[k]) + '" target="_blank" rel="noopener">' + esc(k) + " →</a>"); });
     if (links.length) h += '<div class="qlinks">' + links.join("") + "</div>";
     h += '<p class="qfoot">press <b>E</b> or <b>Esc</b> to close</p>';

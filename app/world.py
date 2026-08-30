@@ -72,6 +72,23 @@ def build_world(db: Session) -> dict:
     ach = {a["label"]: a["text"] for a in repo.achievements(db)}
     edu = repo.education(db)
 
+    snap = repo.get_snapshot(db)
+    if snap and snap.payload:
+        sp = snap.payload
+        obs_lines = [
+            f"{sp.get('repo_count', 0)} public repos, {sp.get('star_count', 0)} stars earned.",
+            f"{sp.get('language_count', 0)} languages across the shelf.",
+        ]
+        if sp.get("total_contributions"):
+            obs_lines.append(f"{sp['total_contributions']} contributions on the calendar.")
+        obs_lines.append("Refreshed nightly by an ETL job. Walk in to see the charts.")
+    else:
+        obs_lines = [
+            "A live dashboard of my GitHub activity — languages, a commit",
+            "heatmap, a repo timeline, and this site's own traffic.",
+            "Built by a nightly ETL job. Walk in to see it.",
+        ]
+
     def P(slug, roof, short):
         return _proj(by_slug, slug, roof, short)
 
@@ -153,16 +170,31 @@ def build_world(db: Session) -> dict:
                 "title": "The Workshop",
                 "body": "Being forged onto this very site:",
                 "objectives": [
-                    "A live data dashboard — GitHub activity ETL, refreshed nightly.",
                     "Semantic project search over pgvector.",
                     "A RAG 'ask my portfolio' chatbot on Gemini.",
+                    "A small classical-ML demo you can poke at.",
                 ],
+            },
+        },
+        {
+            "x": 13,
+            "y": 13,
+            "roof": "#3f7fae",
+            "name": "Observatory",
+            "icon": "telescope",
+            "detail": {
+                "kind": "live data",
+                "title": "The Observatory",
+                "body": " ".join(obs_lines[:2]),
+                "objectives": obs_lines[2:],
+                "link": "/dashboard",
+                "link_label": "open the dashboard →",
             },
         },
     ]
 
     pad = {
-        "x": 13,
+        "x": 16,
         "y": 13,
         "detail": {
             "kind": "skill tree",

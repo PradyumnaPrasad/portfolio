@@ -24,8 +24,9 @@ server-rendered text version is the no-JS / SEO fallback.
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 alembic upgrade head          # creates portfolio.db (SQLite)
+python -m app.etl             # pulls GitHub activity for the /dashboard page
 uvicorn app.main:app --reload # seeds content from app/content.py on startup
-# http://127.0.0.1:8000  ·  API docs at /api
+# http://127.0.0.1:8000  ·  /dashboard  ·  API docs at /api
 ```
 
 ```bash
@@ -57,6 +58,8 @@ ships every push to `main`.
 - [x] **Phase 1** — live skeleton: home page, health check, CI, Render blueprint
 - [x] **Phase 2** — database layer: SQLAlchemy models, Alembic migrations,
       content served from the DB, persistent page-view analytics
-- [ ] **Phase 3** — GitHub-activity ETL + a dashboard building; analytics panel
+- [x] **Phase 3** — GitHub-activity ETL (`python -m app.etl`, nightly cron),
+      the Observatory building + `/dashboard` (languages, repo cadence, repo
+      timeline, this site's traffic)
 - [ ] **Phase 4** — pgvector semantic search + Gemini RAG chatbot + a classical ML demo
 - [ ] **Phase 5** — SEO, sitemap, custom domain, architecture diagram
