@@ -14,14 +14,15 @@ import time
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
+from starlette.middleware.gzip import GZipMiddleware
 
 from app import repo
-from app.config import BASE_DIR, IS_PROD, SITE
+from app.config import BASE_DIR, IS_PROD, SITE, SITE_URL
 from app.dashboard import build_dashboard
 from app.db import SessionLocal, engine, get_session
 from app.ml.classify import predict as ml_predict
@@ -74,15 +75,27 @@ app = FastAPI(
     title="Pradyumna Prasad — Portfolio", docs_url="/api", redoc_url=None, lifespan=lifespan
 )
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+app.add_middleware(GZipMiddleware, minimum_size=800)
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+templates.env.globals["site_url"] = SITE_URL
+
+_SEC_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+}
+_NO_COUNT = ("/favicon.ico", "/robots.txt", "/sitemap.xml", "/og.png")
 
 
 @app.middleware("http")
-async def count_views(request: Request, call_next):
+async def wrap_request(request: Request, call_next):
     response = await call_next(request)
+    for k, v in _SEC_HEADERS.items():
+        response.headers.setdefault(k, v)
     path = request.url.path
     counted = request.method == "GET" and not path.startswith(("/static", "/healthz", "/api"))
-    if counted and path not in ("/favicon.ico", "/robots.txt"):
+    if counted and path not in _NO_COUNT:
         _view_buffer[path] = _view_buffer.get(path, 0) + 1
     return response
 
@@ -184,4 +197,32 @@ async def stats(db: Session = Depends(get_session)) -> JSONResponse:
 
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots() -> PlainTextResponse:
-    return PlainTextResponse("User-agent: *\nAllow: /\n")
+    return PlainTextResponse(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n")
+
+
+@app.get("/sitemap.xml")
+async def sitemap() -> Response:
+    paths = ["/", "/dashboard", "/workshop"]
+    urls = "".join(f"  <url><loc>{SITE_URL}{p}</loc></url>\n" for p in paths)
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{urls}</urlset>\n"
+    )
+    return Response(xml, media_type="application/xml")
+
+
+@app.get("/og.png")
+async def og_image() -> Response:
+    from app.og import render_card
+
+    return Response(
+        render_card(), media_type="image/png", headers={"Cache-Control": "public, max-age=86400"}
+    )
+
+
+@app.exception_handler(404)
+async def not_found(request: Request, exc):
+    if request.url.path.startswith(("/api", "/static")):
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+    return templates.TemplateResponse(request, "404.html", {"site": SITE}, status_code=404)

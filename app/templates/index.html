@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ site.name | tojson }},
+  "url": {{ site_url | tojson }},
+  "email": {{ ("mailto:" ~ site.email) | tojson }},
+  "jobTitle": "Backend & AI/ML Engineer",
+  "description": {{ site.tagline | tojson }},
+  "sameAs": {{ site.links.values() | list | tojson }}
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div id="game" aria-hidden="true">
   <div class="frame">

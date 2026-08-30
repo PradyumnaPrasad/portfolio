@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Off the map — {{ site.name }}{% endblock %}
+{% block description %}Page not found.{% endblock %}
+
+{% block content %}
+<div id="dash">
+  <section class="panel" style="text-align:center; margin-top: 3rem;">
+    <h1 class="press" style="color: var(--gold); font-size: clamp(1.2rem, 5vw, 2rem); line-height: 1.6;">404</h1>
+    <p class="vt" style="font-size: 1.2rem; margin: 1rem 0;">You wandered off the edge of the map.</p>
+    <p class="vt"><a class="gbtn" href="/">▸ back to the village</a></p>
+  </section>
+</div>
+{% endblock %}

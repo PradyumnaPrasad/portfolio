@@ -16,6 +16,8 @@ services:
         value: "3.12.7"
       - key: APP_ENV
         value: production
+      - key: SITE_URL
+        value: https://pradyumnaprasad.dev   # used for canonical / OG / sitemap URLs
       - key: DATABASE_URL
         sync: false   # paste the Neon connection string in the dashboard
       - key: GEMINI_API_KEY

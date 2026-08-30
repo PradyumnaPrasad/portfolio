@@ -7,6 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent
 APP_ENV = os.getenv("APP_ENV", "development")
 IS_PROD = APP_ENV == "production"
 
+# Absolute base URL, for canonical links / sitemap / OG tags.
+SITE_URL = os.getenv("SITE_URL", "https://pradyumnaprasad.dev").rstrip("/")
+
 # Structured site content lives here so pages and the (later) RAG chatbot
 # read from one source of truth.
 SITE = {
