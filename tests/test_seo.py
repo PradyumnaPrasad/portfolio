@@ -10,7 +10,15 @@ def test_sitemap(client):
     r = client.get("/sitemap.xml")
     assert r.status_code == 200
     assert "application/xml" in r.headers["content-type"]
-    assert "/workshop</loc>" in r.text and "/dashboard</loc>" in r.text
+    for p in ("/workshop", "/dashboard", "/contact"):
+        assert f"{p}</loc>" in r.text
+
+
+def test_contact_page(client):
+    r = client.get("/contact")
+    assert r.status_code == 200
+    assert "pradyumnaprasad.05@gmail.com" in r.text
+    assert "leetcode.com/u/Pradyumna_Prasad" in r.text
 
 
 def test_robots_points_to_sitemap(client):

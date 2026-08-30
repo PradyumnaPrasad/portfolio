@@ -156,7 +156,7 @@ def build_world(db: Session) -> dict:
                 "kind": "hall of fame",
                 "title": "Trophy Hall",
                 "objectives": [
-                    ach["MIT Hackathon '25"],
+                    ach["NMIT Hackathon '25"],
                     ach["SIT Pitchathon"],
                     ach["400+ DSA"],
                     ach["AI Brewery Lead"],

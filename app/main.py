@@ -78,6 +78,8 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 app.add_middleware(GZipMiddleware, minimum_size=800)
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 templates.env.globals["site_url"] = SITE_URL
+_mtimes = [p.stat().st_mtime for p in (BASE_DIR / "static").rglob("*") if p.is_file()]
+templates.env.globals["asset_v"] = str(int(max(_mtimes, default=0)))
 
 _SEC_HEADERS = {
     "X-Content-Type-Options": "nosniff",
@@ -129,6 +131,11 @@ async def workshop(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(
         request, "workshop.html", {"site": SITE, "chat_enabled": gemini.enabled()}
     )
+
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(request, "contact.html", {"site": SITE})
 
 
 class Ask(BaseModel):
@@ -202,7 +209,7 @@ async def robots() -> PlainTextResponse:
 
 @app.get("/sitemap.xml")
 async def sitemap() -> Response:
-    paths = ["/", "/dashboard", "/workshop"]
+    paths = ["/", "/dashboard", "/workshop", "/contact"]
     urls = "".join(f"  <url><loc>{SITE_URL}{p}</loc></url>\n" for p in paths)
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

@@ -99,9 +99,9 @@ PROJECTS = [
 
 ACHIEVEMENTS = [
     {
-        "label": "MIT Hackathon '25",
+        "label": "NMIT Hackathon '25",
         "text": (
-            "1st Prize — Open Innovation Track, 48-hour MIT National Hackathon 2025 (300+ teams)."
+            "1st Prize — Open Innovation Track, 48-hour NMIT National Hackathon 2025 (300+ teams)."
         ),
     },
     {"label": "SIT Pitchathon", "text": "1st Prize — SIT Pitchathon 2025 and 2026."},

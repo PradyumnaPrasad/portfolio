@@ -149,17 +149,34 @@
   function dismissTitle() { if (started) return; started = true; titlecard.classList.add("gone"); }
   if (reduced) dismissTitle(); else setTimeout(dismissTitle, 3200);
 
-  // ---- sizing ----
+  // ---- sizing + camera ----
   var TS = 32, U;
+  var cam = { x: 0, y: 0 };
   var gameEl = document.getElementById("game");
   function resize() {
     var availW = gameEl.clientWidth - 28;
-    var availH = window.innerHeight - 56 - 78;
-    TS = Math.max(14, Math.min(52, Math.floor(Math.min(availW / W.cols, availH / W.rows))));
+    var availH = window.innerHeight - 56 - 90;
+    var mapW = availW / W.cols, mapH = availH / W.rows;
+    if (Math.min(mapW, mapH) >= 20) {
+      // whole map fits comfortably — show all of it
+      TS = Math.min(52, Math.floor(Math.min(mapW, mapH)));
+    } else {
+      // small screen — zoom in and let the camera follow the player
+      TS = Math.max(22, Math.min(40, Math.floor(Math.min(availW, availH) / 9)));
+    }
     U = TS / 16;
-    canvas.width = TS * W.cols;
-    canvas.height = TS * W.rows;
+    canvas.width = Math.min(TS * W.cols, Math.floor(availW));
+    canvas.height = Math.min(TS * W.rows, Math.floor(availH));
   }
+  function updateCamera() {
+    var maxX = TS * W.cols - canvas.width;
+    var maxY = TS * W.rows - canvas.height;
+    var tx = maxX <= 0 ? maxX / 2 : clamp((P.fx + 0.5) * TS - canvas.width / 2, 0, maxX);
+    var ty = maxY <= 0 ? maxY / 2 : clamp((P.fy + 0.5) * TS - canvas.height / 2, 0, maxY);
+    cam.x += (tx - cam.x) * 0.2;
+    cam.y += (ty - cam.y) * 0.2;
+  }
+  function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
   window.addEventListener("resize", resize);
   window.addEventListener("viewchange", resize);
   resize();
@@ -346,11 +363,15 @@
         if (Math.abs(P.fx - P.tx) < 0.02 && Math.abs(P.fy - P.ty) < 0.02) { P.fx = P.tx; P.fy = P.ty; P.moving = false; }
       } else P.anim = 0;
     }
+    updateCamera();
     draw();
     requestAnimationFrame(frame);
   }
 
   function draw() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.translate(-Math.round(cam.x), -Math.round(cam.y));
     drawGround();
     var sprites = [];
     W.structures.forEach(function (s) { sprites.push({ z: s.y + 1, fn: function () { drawHouse(s); } }); });
@@ -360,6 +381,7 @@
     sprites.sort(function (a, b) { return a.z - b.z; });
     sprites.forEach(function (s) { s.fn(); });
     drawBubble();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     drawVignette();
   }
 

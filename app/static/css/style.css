@@ -134,7 +134,20 @@ html:not(.js) #game { display: none; }
 #dpad button[data-k="right"] { grid-area: 2 / 3; }
 #dpad button[data-k="down"] { grid-area: 3 / 2; }
 @media (hover: hover) and (pointer: fine) { #dpad { opacity: .3; } #dpad:hover { opacity: .9; } }
-@media (max-width: 40rem) { .keyhints { display: none; } .hud-tl .sub { display: none; } }
+
+@media (max-width: 40rem) {
+  .keyhints, .hud-tl .sub, .nameplate { display: none; }
+  #game { height: calc(100vh - var(--header-h)); padding: .4rem 0; }
+  .frame { padding-top: 2.3rem; border-width: 4px; }
+  .hud-tr { top: .35rem; right: .45rem; }
+  .gbtn { font-size: .9rem; padding: .25rem .55rem; }
+  #dpad { right: .45rem; bottom: .45rem; grid-template-columns: repeat(3, 3.1rem); grid-template-rows: repeat(3, 3.1rem); opacity: .95; }
+}
+@media (max-width: 34rem) {
+  .topbar { padding: 0 .8rem; }
+  .brand { font-size: .82rem; }
+  .topbar nav { gap: .7rem; font-size: .74rem; }
+}
 
 /* ---- quest panel ---- */
 #quest {
@@ -204,8 +217,16 @@ html:not(.js) #game { display: none; }
 .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
 .stack-grid > div { background: var(--parch-lo); border: 2px solid var(--wood); border-left: 3px solid var(--gold); padding: .8rem 1rem; }
 .note { margin-top: 1.4rem; color: var(--muted); }
-footer { max-width: var(--max); margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem) 2.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; color: var(--muted); border-top: 2px solid var(--wood); }
+footer { max-width: var(--max); margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem) 2.5rem; display: flex; flex-direction: column; gap: .7rem; color: var(--muted); border-top: 2px solid var(--wood); font-family: var(--vt); }
 footer a { color: var(--link); }
+.foot-links { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: 1.05rem; }
+footer .mono { font-size: .78rem; }
+
+/* ---- contact (/contact) ---- */
+.contact-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; font-size: 1.1rem; }
+.contact-list li { display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: baseline; }
+.contact-list .k { color: var(--gold); min-width: 5rem; }
+.contact-list a { color: var(--link); word-break: break-all; }
 
 /* ---- dashboard (/dashboard) ---- */
 #dash { max-width: 54rem; margin: 0 auto; padding: 1.5rem clamp(1rem, 4vw, 3rem) 4rem; color: var(--ink); }
@@ -266,6 +287,18 @@ footer a { color: var(--link); }
 .suggest button:hover { border-color: var(--gold); color: var(--gold); }
 a.chip { text-decoration: none; }
 a.chip:hover { border-color: var(--gold); color: var(--gold); }
+
+@media (max-width: 40rem) {
+  #dash { padding: 1.2rem 1rem 3rem; }
+  #dash .panel { padding: 1rem; }
+  .langrow { grid-template-columns: 6rem 1fr 2.4rem; gap: .5rem; font-size: .95rem; }
+  .timeline li { grid-template-columns: 2.6rem 1fr; }
+  .timeline li .muted { grid-column: 2; font-size: .85rem; }
+  .wform { flex-wrap: wrap; }
+  .wform input { flex: 1 1 100%; }
+  .wform .gbtn { flex: 0 0 auto; }
+  .tiles { grid-template-columns: repeat(2, 1fr); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   #titlecard, #quest { transition: none; }

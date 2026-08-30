@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Contact — {{ site.name }}{% endblock %}
+{% block description %}Get in touch with {{ site.name }} — {{ site.location }}.{% endblock %}
+
+{% block content %}
+<div id="dash">
+  <header class="dash-head">
+    <a class="back vt" href="/">← back to the map</a>
+    <h1 class="press">Contact</h1>
+    <p class="vt muted">{{ site.location }}</p>
+  </header>
+
+  <section class="panel">
+    <p class="vt" style="font-size:1.15rem; margin-bottom:1rem;">
+      {{ site.tagline }} Open to backend, ML/AI, full-stack and SDE roles.
+      Fastest reply by email.
+    </p>
+    <ul class="contact-list vt">
+      <li><span class="k">email</span><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+      {% for label, url in site.links.items() %}
+      <li><span class="k">{{ label | lower }}</span><a href="{{ url }}" target="_blank" rel="noopener">{{ url | replace('https://', '') | replace('www.', '') }}</a></li>
+      {% endfor %}
+      <li><span class="k">résumé</span><a href="{{ site.resume_path }}" target="_blank" rel="noopener">Pradyumna_Prasad_Resume.pdf</a></li>
+    </ul>
+  </section>
+</div>
+{% endblock %}

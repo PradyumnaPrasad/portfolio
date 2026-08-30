@@ -15,7 +15,7 @@ def test_home_renders_game_and_text_fallback(client):
     assert 'id="world-data"' in body
     assert "Dual Insight Engine" in body
     assert "Hexango" in body
-    assert "MIT National Hackathon" in body
+    assert "NMIT National Hackathon" in body
 
 
 def test_world_is_consistent(client, db):

@@ -16,8 +16,8 @@ SITE = {
     "name": "Pradyumna Prasad",
     "tagline": "Backend & AI/ML engineer. I build data pipelines, RAG systems, and APIs that ship.",
     "subline": (
-        "3rd-year CSE (AI/ML) @ SIT  ·  Data & AI intern at Hexango  ·  "
-        "400+ DSA problems  ·  MIT National Hackathon '25 winner"
+        "4th-year CSE (AI/ML) @ SIT  ·  Data & AI intern at Hexango  ·  "
+        "400+ DSA problems  ·  NMIT National Hackathon '25 winner"
     ),
     "location": "Tumakuru, India — open to Bengaluru / remote",
     "email": "pradyumnaprasad.05@gmail.com",

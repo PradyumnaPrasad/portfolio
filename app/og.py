@@ -9,7 +9,7 @@ import io
 import textwrap
 from functools import lru_cache
 
-from app.config import SITE, SITE_URL
+from app.config import SITE
 
 W, H = 1200, 630
 BG = (22, 18, 12)
@@ -44,17 +44,16 @@ def render_card() -> bytes:
     mid = ImageFont.load_default(size=34)
     small = ImageFont.load_default(size=26)
 
-    d.text((80, 84), "pradyumna.dev", font=mid, fill=GOLD)
-    d.text((80, 146), SITE["name"], font=big, fill=INK)
+    d.text((80, 92), "PORTFOLIO", font=small, fill=GOLD)
+    d.text((80, 138), SITE["name"], font=big, fill=INK)
     for j, line in enumerate(textwrap.wrap(SITE["tagline"], width=48)):
-        d.text((80, 258 + j * 44), line, font=mid, fill=INK)
+        d.text((80, 250 + j * 44), line, font=mid, fill=INK)
     d.text(
-        (80, 380),
+        (80, 372),
         "CSE (AI/ML) @ SIT  ·  Data & AI intern at Hexango  ·  400+ DSA  ·  hackathon winner",
         font=small,
         fill=MUTED,
     )
-    d.text((80, H - 54), SITE_URL.replace("https://", ""), font=small, fill=MUTED)
 
     buf = io.BytesIO()
     img.save(buf, format="PNG", optimize=True)
